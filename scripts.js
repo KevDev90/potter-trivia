@@ -27,16 +27,20 @@ const store = {
     playerScore: 0,
 };
 
-
-function startQuiz() {
-  
+function getCurrentQuestion () {
+    let index = store.questionNumber;
+    let currentQuestion = store.questions[index];
+    return {index: index +1, questionTotal: currentQuestion};
 }
 
-function changeQuestion () {
-    
-}
-
-function changeAnswerChoices () {
+function getAnswerChoices () {
+        let answerList = "";
+        getCurrentQuestion().questionTotal.answers.forEach(answer => {
+            answerList += `<li>
+            <input type="radio" name="answerOptions" value="${answer}"> ${answer} </input>
+            </li>`;
+        })  
+        return answerList;
     
 }
 
@@ -60,12 +64,7 @@ function showCurrentScore () {
     
 }
 
-function showCurrentQuestion () {
-    
-} 
-
 function showStartPage() {
-    console.log('1')
     return `
     <div class="start-message">
         <h3>Welcome!</h3>
@@ -78,21 +77,23 @@ function showStartPage() {
 }
 
 function showQuizPage() {
+    console.log(store.questions.length)
     return `
-        <div class="quiz-page">
-        <p>Question $(store.questions.index + 1) out of $(store.questions.length)</p>
-        <p>Score: $(store.playerScore) / $(store.questions.length)</p>
+        <div class="questionAndAnswers">
+        <p>Question ${getCurrentQuestion().index} out of ${store.questions.length}</p>
+        <p>Score: ${store.score} / ${store.questions.length}</p>
         <br>
-            $(currentQuestion)
+            ${getCurrentQuestion().questionTotal.question}
         <br>
             <form>
-                 $(currentAnswers)
+            <ul>
+                ${getAnswerChoices()}
+            </ul>
             <br>
                   <button type="submit" class="submit-answer">Submit</button>
-                  <button type="button" class="next-answer">Next</button>
              </form>
         </div>
-        `
+        `;
 }
 
 
@@ -107,7 +108,7 @@ function showResultsPage() {
 
 
 
-function userClicksStart() {
+function startQuiz() {
     $('main').on('click', '#start-btn', function (event){
         event.preventDefault();
         store.quizStarted = true;
@@ -133,10 +134,7 @@ function renderDom() {
 
 function renderQuiz() {
     renderDom();
-    showStartPage();
-    showQuizPage()
-    showResultsPage()
-    userClicksStart()
+    startQuiz()
 }
 
 $(renderQuiz);

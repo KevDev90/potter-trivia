@@ -33,7 +33,7 @@ function getCurrentQuestion () {
     return {index: index +1, questionTotal: currentQuestion};
 }
 
-function getAnswerChoices () {
+function getAnswers () {
         let answerList = "";
         getCurrentQuestion().questionTotal.answers.forEach(answer => {
             answerList += `<li>
@@ -41,11 +41,62 @@ function getAnswerChoices () {
             </li>`;
         })  
         return answerList;
-    
 }
 
 function submitAnswer () {
+    console.log('in submitAnswer')
+    $("main").on('click', '.submit-answer', event => {
+        event.preventDefault();
+        getChosenAnswer();
+        showAnswerResult();
+        renderQuiz();
+    });
+}
 
+function getChosenAnswer() {
+    let selected= $("input[type='radio'][name='answerOptions']:checked");
+    let selectedAnswer="";
+    if (selected.length > 0) {
+        selectedAnswer = selected.val();
+    } 
+    console.log(selectedAnswer, '2')
+    return selectedAnswer;
+}
+
+function isGuessCorrect() {
+    console.log('in guessCorrect');
+    let isCorrect = false;
+    let correctAnswer = getCurrentQuestion().questionTotal.correctAnswer;
+    console.log(correctAnswer)
+    let selectedAnswer = getChosenAnswer();
+    console.log(selectedAnswer)
+    if (selectedAnswer === correctAnswer){
+        console.log('correct');
+        store.playerScore ++;
+        isCorrect = true;
+        return isCorrect;
+    }
+    else {
+        console.log('wrongo');
+        return isCorrect;
+    }
+};
+
+function showAnswerResult() {
+    console.log('answer result html');
+    if (isGuessCorrect() === true) {
+        console.log('true result html');
+        return `
+        <div class="answer-reults"> <p> You are Correct!</p>
+        <button type='submit' class='next-question id='next'>Next</button>
+        </div>`;
+    }
+    else {
+        console.log('false result html');
+        return `<div class="answer-results"><p>You are incorrect. The correct answer is ${getCurrentQuestion().questionTotal.correctAnswer}</div>
+        <button type='submit' class='next-question id='next'>Next</button>
+        </div>`; 
+    }
 }
 
 function nextQuestion () {
@@ -77,17 +128,16 @@ function showStartPage() {
 }
 
 function showQuizPage() {
-    console.log(store.questions.length)
     return `
         <div class="questionAndAnswers">
         <p>Question ${getCurrentQuestion().index} out of ${store.questions.length}</p>
-        <p>Score: ${store.score} / ${store.questions.length}</p>
+        <p>Score: ${store.playerScore} / ${store.questions.length}</p>
         <br>
             ${getCurrentQuestion().questionTotal.question}
         <br>
             <form>
             <ul>
-                ${getAnswerChoices()}
+                ${getAnswers()}
             </ul>
             <br>
                   <button type="submit" class="submit-answer">Submit</button>
@@ -122,7 +172,7 @@ function renderDom() {
        html = $('main').html(showStartPage());
        return html;
     }
-    if(store.quizStarted === true) {
+    if(store.questionNumber < store.questions.length) {
         html = $('main').html(showQuizPage());
         return html;
     }
@@ -134,7 +184,8 @@ function renderDom() {
 
 function renderQuiz() {
     renderDom();
-    startQuiz()
+    startQuiz();
+    submitAnswer();
 }
 
 $(renderQuiz);

@@ -25,15 +25,16 @@ const store = {
     quizStarted: false,
     questionNumber: 0,
     playerScore: 0,
+    submittingAnswer: false
 };
 
-function getCurrentQuestion () {
+function getCurrentQuestion() {
     let index = store.questionNumber;
     let currentQuestion = store.questions[index];
-    return {index: index +1, questionTotal: currentQuestion};
+    return {index: index, questionTotal: currentQuestion};
 }
 
-function getAnswers () {
+function getAnswers() {
         let answerList = "";
         getCurrentQuestion().questionTotal.answers.forEach(answer => {
             answerList += `<li>
@@ -43,13 +44,14 @@ function getAnswers () {
         return answerList;
 }
 
-function submitAnswer () {
+function submitAnswer() {
     console.log('in submitAnswer')
     $("main").on('click', '.submit-answer', event => {
         event.preventDefault();
         getChosenAnswer();
+        showCurrentScore();
         showAnswerResult();
-        renderQuiz();
+        renderDom();
     });
 }
 
@@ -72,47 +74,58 @@ function isGuessCorrect() {
     console.log(selectedAnswer)
     if (selectedAnswer === correctAnswer){
         console.log('correct');
-        store.playerScore ++;
         isCorrect = true;
+        store.submittingAnswer = true;
         return isCorrect;
     }
     else {
         console.log('wrongo');
+        store.submittingAnswer = true;
         return isCorrect;
     }
 };
 
 function showAnswerResult() {
-    console.log('answer result html');
     if (isGuessCorrect() === true) {
         console.log('true result html');
         return `
-        <div class="answer-reults"> <p> You are Correct!</p>
-        <button type='submit' class='next-question id='next'>Next</button>
+        <div class="answer-results">
+        <form> <p> You're Correct!</p>
+        <button type='submit'class="next-question">Next</button>
+        </form>
         </div>`;
     }
     else {
-        console.log('false result html');
-        return `<div class="answer-results"><p>You are incorrect. The correct answer is ${getCurrentQuestion().questionTotal.correctAnswer}</div>
-        <button type='submit' class='next-question id='next'>Next</button>
+        return `<div class="answer-results">
+        <form> <p>You are incorrect. The correct answer is ${getCurrentQuestion().questionTotal.correctAnswer}</div>
+        <button type='submit' class="next-question">Next</button>
+        </form>
         </div>`; 
     }
 }
 
-function nextQuestion () {
+function nextQuestion() {
+    store.submittingAnswer = false;
+    store.questionNumber ++;
+}
+
+function clickNextButton() {
+    $('main').on('click', '.next-question', event => {
+        console.log('next clicked');
+    event.preventDefault();
+    nextQuestion();
+    renderDom();
+});
+}
+
+function restartQuiz() {
     
 }
 
-function displayResults () {
-   
-}
-
-function restartQuiz () {
-    
-}
-
-function showCurrentScore () {
-    
+function showCurrentScore() {
+    if (isGuessCorrect() === true) {
+        store.playerScore++;
+    }
 }
 
 function showStartPage() {
@@ -130,7 +143,7 @@ function showStartPage() {
 function showQuizPage() {
     return `
         <div class="questionAndAnswers">
-        <p>Question ${getCurrentQuestion().index} out of ${store.questions.length}</p>
+        <p>Question ${getCurrentQuestion().index + 1} out of ${store.questions.length}</p>
         <p>Score: ${store.playerScore} / ${store.questions.length}</p>
         <br>
             ${getCurrentQuestion().questionTotal.question}
@@ -149,36 +162,39 @@ function showQuizPage() {
 
 function showResultsPage() {
     return `
-        <div class="results-page">
-        <h3>Congrats! You have completed the Harry Potter Quiz!</h3>
-        <p>Your score is $(store.playerScore) out of $(store.questions.length)!</p>
-        <button type="button" id="restart-quiz">Restart Quiz</button>
-    `
+        <div class="results">
+        <h3>Congratulations! You have completed my Harry Potter quiz!</h3>
+        <p>Your score is ${store.playerScore} out of ${store.questions.length}!</p>
+        <button class="restart-quiz">Restart Quiz</button>
+    `;
 }
-
-
 
 function startQuiz() {
     $('main').on('click', '#start-btn', function (event){
         event.preventDefault();
         store.quizStarted = true;
+        store.submittingAnswer === false;
         renderDom();
     })
 }
 
 function renderDom() {
     let html = "";
-    if(store.quizStarted === false) {
+    if (store.quizStarted === false) {
        html = $('main').html(showStartPage());
        return html;
     }
-    if(store.questionNumber < store.questions.length) {
+    else if (store.questionNumber < store.questions.length) {
+            if (store.submittingAnswer === false){
         html = $('main').html(showQuizPage());
+            }
+            else {
+                html = $('main').html(showAnswerResult());
+            }
         return html;
-    }
+        }
     else {
-        html = $('main').html(showResultsPage())
-        return html;
+        html = $('main').html(showResultsPage());
     }
 }
 
@@ -186,6 +202,8 @@ function renderQuiz() {
     renderDom();
     startQuiz();
     submitAnswer();
+    clickNextButton();
+    
 }
 
 $(renderQuiz);

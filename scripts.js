@@ -13,8 +13,8 @@ const store = {
         answers: ["Cedric", "Harry", "Hermione", "Fred"],
         correctAnswer: "Cedric"},
     {question: "In the Order of the Phoenix, where does Harry first encounter Delores Umbridge?", 
-        answers: ["hogwarts", "12 grimmauld place", "little whinging", "his hearing at the ministry of magic"],
-        correctAnswer: "his hearing at the ministry of magic"},
+        answers: ["Hogwarts", "12 Grimmauld place", "Little Whinging", "His hearing at the ministry of magic"],
+        correctAnswer: "His hearing at the ministry of magic"},
     {question: "In the Half Blood Prince, how old must a student be in order to take an Apparition test?",
         answers: ["14", "15", "16", "17"],
         correctAnswer: "17"},
@@ -97,7 +97,7 @@ function showAnswerResult() {
     }
     else {
         return `<div class="answer-results">
-        <form> <p>You are incorrect. The correct answer is ${getCurrentQuestion().questionTotal.correctAnswer}</div>
+        <form> <p>You are incorrect. The correct answer is: ${getCurrentQuestion().questionTotal.correctAnswer}</div>
         <button type='submit' class="next-question">Next</button>
         </form>
         </div>`; 

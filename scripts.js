@@ -119,7 +119,18 @@ function clickNextButton() {
 }
 
 function restartQuiz() {
-    
+    store.questionNumber = 0;
+    store.playerScore = 0;
+    store.quizStarted = false;
+    store.submittingAnswer = false;
+}
+
+function clickRestartButton() {
+    $('main').on('click', '.restart-quiz', event => {
+        event.preventDefault();
+        restartQuiz();
+        renderDom();
+    })
 }
 
 function showCurrentScore() {
@@ -203,7 +214,7 @@ function renderQuiz() {
     startQuiz();
     submitAnswer();
     clickNextButton();
-    
+    clickRestartButton();
 }
 
 $(renderQuiz);

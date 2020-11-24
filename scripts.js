@@ -38,7 +38,8 @@ function getAnswers() {
         let answerList = "";
         getCurrentQuestion().questionTotal.answers.forEach(answer => {
             answerList += `<li>
-            <input type="radio" name="answerOptions" value="${answer}"> ${answer} </input>
+            <label>
+            <input type="radio" name="answerOptions" value="${answer}"> ${answer}</label>
             </li>`;
         })  
         return answerList;
@@ -48,10 +49,11 @@ function submitAnswer() {
     console.log('in submitAnswer')
     $("main").on('click', '.submit-answer', event => {
         event.preventDefault();
-        getChosenAnswer();
-        showCurrentScore();
-        showAnswerResult();
-        renderDom();
+        if(isAnswerSelected()) {
+            showCurrentScore();
+            showAnswerResult();
+            renderDom();
+        }
     });
 }
 
@@ -60,9 +62,8 @@ function getChosenAnswer() {
     let selectedAnswer="";
     if (selected.length > 0) {
         selectedAnswer = selected.val();
+        return selectedAnswer;
     } 
-    console.log(selectedAnswer, '2')
-    return selectedAnswer;
 }
 
 function isGuessCorrect() {
@@ -139,6 +140,28 @@ function showCurrentScore() {
     }
 }
 
+function isAnswerSelected() {
+    if ($('input:radio[name=answerOptions]').filter(':checked').length === 0) {
+        alert('You must select an answer first!');
+        store.submittingAnswer = false;
+        return false;
+    }
+    return true;
+}
+
+function percentage(partialValue, totalValue) {
+    return Math.round((100 * partialValue) / totalValue);
+ } 
+
+function resultMsg() {
+   
+    if(percentage(store.playerScore, store.questions.length) < 70) {
+        return 'Did you have a muggle help you with that? Try again!'
+    } else {
+        return 'Great Job! You are a regular Potterhead!'
+    } 
+}
+
 function showStartPage() {
     return `
     <div class="start-message">
@@ -175,7 +198,9 @@ function showResultsPage() {
     return `
         <div class="results">
         <h3>Congratulations! You have completed my Harry Potter quiz!</h3>
-        <p>Your score is ${store.playerScore} out of ${store.questions.length}!</p>
+        <p>Your score is ${store.playerScore} out of ${store.questions.length} which is ${percentage(store.playerScore, store.questions.length)}%!</p>
+        <p>${resultMsg()}
+        <br>
         <button class="restart-quiz">Restart Quiz</button>
     `;
 }

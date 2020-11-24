@@ -89,14 +89,14 @@ function showAnswerResult() {
     if(isGuessCorrect() === true) {
         return `
         <div class="answer-results">
-        <form> <p> You're Correct!</p>
+        <form> <p class='correct'> You're Correct!</p>
         <button type='submit'class="next-question">Next</button>
         </form>
         </div>`;
     }
     else {
         return `<div class="answer-results">
-        <form> <p>You are incorrect. The correct answer is: ${getCurrentQuestion().questionTotal.correctAnswer}</div>
+        <form> <p class='incorrect'>You are incorrect. The correct answer is: ${getCurrentQuestion().questionTotal.correctAnswer}</div>
         <button type='submit' class="next-question">Next</button>
         </form>
         </div>`; 
@@ -106,9 +106,9 @@ function showAnswerResult() {
 function showStartPage() {
     return `
     <div class="start-message">
-        <h3>Welcome!</h3>
-        <p>Welcome to my Harry Potter Quiz application! This quiz will test your knowledge of Harry Potter trivia!</p>
-           <p> Click the 'Start' button below to begin!</p>
+        <h3>Welcome to my Harry Potter Quiz application!</h3>
+        <p> This quiz will test your knowledge of Harry Potter trivia!</p>
+           <p> Click the 'Start Quiz' button below to begin!</p>
            <form>
         <button type="button" id="start-btn">Start Quiz</button>
            </form>
@@ -118,11 +118,12 @@ function showStartPage() {
 function showQuizPage() {
     return `
         <div class="questionAndAnswers">
+        <div class="QandA">
         <p>Question ${getCurrentQuestion().index + 1} out of ${store.questions.length}</p>
         <p>Score: ${store.playerScore} / ${store.questions.length}</p>
+        </div>
         <br>
-            ${getCurrentQuestion().questionTotal.question}
-        <br>
+            <p class="question">${getCurrentQuestion().questionTotal.question}</p>
             <form>
             <ul>
                 ${getAnswers()}
